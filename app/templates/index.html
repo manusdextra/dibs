@@ -7,5 +7,18 @@
 {% endblock %}
 
 {% block body %}
-<h1>Hello World!</h1>
+<h1>Hello {% if name %}{{ name|capitalize }}{% else %}World!{% endif %}</h1>
+<form method="POST">
+  {{ form.csrf_token }}
+  {{ form.name.label }}
+  {{ form.name() }}
+  <input type="submit" value="OK" />
+  {% if form.name.errors %}
+      <ul class="errors">
+      {% for error in form.name.errors %}
+          <li>{{ error }}</li>
+      {% endfor %}
+      </ul>
+  {% endif %}
+</form>
 {% endblock %}
