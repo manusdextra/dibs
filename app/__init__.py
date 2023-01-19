@@ -1,5 +1,6 @@
 from flask import Flask
 from config import config
+from flask_sqlalchemy import SQLAlchemy
 
 
 def create_app(config_name) -> Flask:
@@ -7,7 +8,11 @@ def create_app(config_name) -> Flask:
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
+    db = SQLAlchemy()
     from app.main import main as main_blueprint
+
     app.register_blueprint(main_blueprint)
+
+    db.init_app(app)
 
     return app
