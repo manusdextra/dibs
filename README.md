@@ -1,4 +1,4 @@
-# Wunschzettel
+# Dibs
 
 In my family, we write wishlists. Which is a brilliant idea because everyone gets what they want and no one has to think too hard. And with a long enough list, there are always surprises. The most frequent surprise is that of duplicate presents, which this pet project aims to address.
 
