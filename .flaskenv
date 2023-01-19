@@ -1,0 +1,3 @@
+FLASK_DEBUG=True
+FLASK_APP=wunschzettel.py
+FLASK_RUN_PORT=8000
