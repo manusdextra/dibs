@@ -8,7 +8,19 @@
     {% endblock %}
   </head>
   <body>
+    {% block content %}
+    <div>
+      {% for message in get_flashed_messages() %}
+      <div>
+        <button type="button" data-dismiss="alert">&times;</button>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endblock content %}
+    {% block page_content %}
+    {% endblock page_content %}
     {% block body %}
-    {% endblock %}
+    {% endblock body %}
   </body>
 </html>
