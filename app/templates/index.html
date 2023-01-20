@@ -8,6 +8,7 @@
 
 {% block body %}
 <h1>Hello {% if name %}{{ name|capitalize }}{% else %}World!{% endif %}</h1>
+<p>{% if not known %}Pleased to meet you!{% else %}Welcome back!{% endif %}</p>
 <form method="POST">
   {{ form.csrf_token }}
   {{ form.name.label }}
