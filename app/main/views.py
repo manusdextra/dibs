@@ -1,4 +1,5 @@
-from flask import flash, render_template, session, redirect, url_for
+from flask import current_app, flash, render_template, session, redirect, url_for
+from app.email import send_email
 
 from app.main.forms import NameForm
 from app.models import User
@@ -15,6 +16,8 @@ def index():
             user = User(username = form.name.data)
             db.session.add(user)
             session["known"] = False
+            if current_app.config["DIBS_ADMIN"]:
+                send_email(current_app.config["DIBS_ADMIN"], "New User", "mail/newuser", user=user)
         else:
             session["known"] = True
         session["name"] = form.name.data
