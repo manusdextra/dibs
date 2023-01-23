@@ -1,0 +1,7 @@
+Dear {{ user.username }},
+Welcome to Dibs!
+To confirm your account please <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">click here</a>.
+Alternatively, you can paste the following link in your browser's address bar:
+{{ url_for('auth.confirm', token=token, _external=True) }}
+Thanks!
+<small>Note: replies to this email address are not monitored.</small>

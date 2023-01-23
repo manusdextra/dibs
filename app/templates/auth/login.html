@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}
+dibs - Login
+{% endblock title %}
+
+{% block page_content %}
+  <h1>Login</h1>
+  <div>
+  <form method="POST">
+    {{ form.csrf_token }}
+    {{ form.email.label }}
+    {{ form.email() }}
+    {{ form.password.label }}
+    {{ form.password() }}
+    {{ form.remember_me.label }}
+    {{ form.remember_me() }}
+    <input type="submit" value="OK" />
+    {% if form.errors %}
+        <ul class="errors">
+          Invalid input(s):
+        {% for error in form.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+  </form>
+  </div>
+
+  <p>New user? <a href="{{ url_for("auth.register")}}">Click here to register</a></p>
+{% endblock page_content %}

@@ -8,6 +8,15 @@
     {% endblock %}
   </head>
   <body>
+    {% block navbar %}
+    <ul id="navbar">
+      {% if current_user.is_authenticated %}
+      <li><a href="{{url_for("auth.logout")}}">Sign Out</a></li>
+      {% else %}
+      <li><a href="{{url_for("auth.login")}}">Sign In</a></li>
+      {% endif %}
+    </ul>
+    {% endblock navbar %}
     {% block content %}
     <div>
       {% for message in get_flashed_messages() %}
