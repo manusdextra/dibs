@@ -4,6 +4,7 @@ dibs - Login
 {% endblock title %}
 
 {% block page_content %}
+<section id="register">
   <h1>Login</h1>
   <div>
   <form method="POST">
@@ -27,4 +28,5 @@ dibs - Login
   </div>
 
   <p>New user? <a href="{{ url_for("auth.register")}}">Click here to register</a></p>
+</section>
 {% endblock page_content %}

@@ -3,22 +3,27 @@
   <head>
     {% block head %}
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/pico.css">
     <title>{% block title %}{% endblock %}</title>
-    {% endblock %}
+    {% endblock head %}
   </head>
   <body>
+    <header class="container">
     {% block navbar %}
-    <ul id="navbar">
+    <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
       {% if current_user.is_authenticated %}
       <li><a href="{{url_for("auth.logout")}}">Sign Out</a></li>
       {% else %}
       <li><a href="{{url_for("auth.login")}}">Sign In</a></li>
       {% endif %}
     </ul>
+    </nav>
     {% endblock navbar %}
-    {% block content %}
-    <div>
+
+    <div class="container">
       {% for message in get_flashed_messages() %}
       <div>
         <button type="button" data-dismiss="alert">&times;</button>
@@ -26,9 +31,16 @@
       </div>
       {% endfor %}
     </div>
+
+    {% block content %}
     {% endblock content %}
+    </header>
+
+    <div class="container">
     {% block page_content %}
     {% endblock page_content %}
+    </div>
+
     {% block body %}
     {% endblock body %}
   </body>
