@@ -1,1 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %} dibs - Profile {% endblock title %}
+
+{% block page_content %}
 <h1>Hi, {{ user|capitalize }}!</h1>
+  <div>
+    <ul>
+      <li><a href="{{url_for("auth.change_password")}}">Change Password</a></li>
+    </ul>
+  </div>
+{% endblock page_content %}

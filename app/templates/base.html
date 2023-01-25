@@ -13,8 +13,11 @@
     {% block navbar %}
     <nav>
     <ul>
-      <li><a href="/">Home</a></li>
+      <li><a href="{{url_for("main.index")}}">Home</a></li>
+    </ul>
+    <ul>
       {% if current_user.is_authenticated %}
+      <li><a href="{{url_for("main.user", name=current_user.username)}}">Profile</a></li>
       <li><a href="{{url_for("auth.logout")}}">Sign Out</a></li>
       {% else %}
       <li><a href="{{url_for("auth.login")}}">Sign In</a></li>
