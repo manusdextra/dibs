@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %} dibs - Change Email Address{% endblock %}
+
+{% block page_content %}
+<h1>Change Your Email Address</h1>
+  <div>
+  <form method="POST">
+    {% for item in form %}
+      {% if item.id != "csrf_token" %}
+      {{ item.label }}
+      {% endif %}
+      {{ item() }}
+    {% endfor %}
+    {% if form.errors %}
+        <ul class="errors">
+          Invalid input(s):
+        {% for error in form.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+  </form>
+  </div>
+{% endblock %}
