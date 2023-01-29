@@ -1,4 +1,6 @@
 from flask import current_app, flash, render_template, session, redirect, url_for
+from flask_login import login_required
+from app.decorators import admin_required
 from app.email import send_email
 
 from app.main.forms import NameForm
@@ -34,6 +36,13 @@ def index():
         name=session.get("name"),
         known=session.get("known", False),
     )
+
+
+@main.route("/admin")
+@login_required
+@admin_required
+def for_admins_only():
+    return "Admins only"
 
 
 @main.route("/user/<name>")
