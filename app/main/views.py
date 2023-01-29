@@ -1,4 +1,4 @@
-from flask import current_app, flash, render_template, session, redirect, url_for
+from flask import abort, current_app, flash, render_template, session, redirect, url_for
 from flask_login import login_required
 from app.decorators import admin_required
 from app.email import send_email
@@ -45,6 +45,9 @@ def for_admins_only():
     return "Admins only"
 
 
-@main.route("/user/<name>")
-def user(name):
-    return render_template("user.html", user=name)
+@main.route("/user/<username>")
+def user(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    return render_template("user.html", user=user)

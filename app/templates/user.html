@@ -3,11 +3,14 @@
 {% block title %} dibs - Profile {% endblock title %}
 
 {% block page_content %}
-<h1>Hi, {{ user|capitalize }}!</h1>
+<h1>Hi, {{ user.username|capitalize }}!</h1>
   <div>
     <ul>
       <li><a href="{{url_for("auth.change_password")}}">Change Password</a></li>
       <li><a href="{{ url_for('auth.change_email_request') }}">Change Email Adress</a></li>
     </ul>
+  </div>
+  <div>
+    Last seen {{ user.last_seen}}.
   </div>
 {% endblock page_content %}
