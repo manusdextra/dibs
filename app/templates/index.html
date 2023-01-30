@@ -10,17 +10,7 @@
       Hello, {% if current_user.is_authenticated %}{{
       current_user.username|capitalize }}{% else %}Stranger{% endif %}!
     </p>
-    {% if current_user.lists %}
-    <p>Here are your lists:</p>
-    <ul>
-      {% for list in current_user.lists %}
-      <li>
-        <a href="{{ url_for("main.read", list_id=list.id) }}">{{ list.title }}</a>
-      </li>
-      {% endfor %}
-    <li><a href="{{ url_for("main.create") }}">Create a New list</a></li>
-    </ul>
-    {% endif %}
+    <p>Have a look at your <a href="{{ url_for("main.lists")}}">lists</a></p>
   </section>
 </main>
 {% endblock %}

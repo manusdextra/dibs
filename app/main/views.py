@@ -49,18 +49,33 @@ def create():
             author=current_user._get_current_object(),
         )
         db.session.add(newlist)
-        return redirect(url_for("main.index"))
-    lists = List.query.order_by(List.timestamp.desc()).all()
+        db.session.commit()
+        return redirect(url_for("main.list", list_id=newlist.id))
     return render_template(
         "create.html",
         form=form,
-        lists=lists,
+    )
+
+@main.route("/lists/", methods=["GET", "POST"])
+@login_required
+def lists():
+    """
+    Show lists you have created yourself
+    """
+    lists = List.query.filter_by(author_id=current_user.id).all()
+    return render_template(
+            "lists.html",
+            lists=lists,
     )
 
 
-@main.route("/read/<list_id>", methods=["GET", "POST"])
+
+@main.route("/lists/<list_id>", methods=["GET", "POST"])
 @login_required
-def read(list_id):
+def list(list_id):
+    """
+    Show a single list by ID
+    """
     form = ItemForm()
     if current_user.can(Permission.READ) and form.validate_on_submit():
         newitem = Item(
@@ -70,7 +85,7 @@ def read(list_id):
             list_id=list_id,
         )
         db.session.add(newitem)
-        return redirect(url_for("main.read", list_id=list_id))
+        return redirect(url_for("main.list", list_id=list_id))
     currentlist = List.query.filter_by(id=list_id).first()
     items = Item.query.filter_by(list_id=list_id).all()
     return render_template(
@@ -79,6 +94,16 @@ def read(list_id):
         items=items,
         form=form,
     )
+
+
+@main.route("/lists/<list_id>/delete", methods=["GET", "POST"])
+@login_required
+def delete_list(list_id):
+    currentlist = List.query.filter_by(id=list_id).first()
+    if current_user.can(Permission.DELETE):
+        db.session.delete(currentlist)
+    flash(f" Your list \"{currentlist.title}\" has been deleted")
+    return redirect(url_for("main.lists"))
 
 
 @main.route("/admin")

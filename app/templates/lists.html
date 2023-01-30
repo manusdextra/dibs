@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block title %}dibs - Your Lists{% endblock %}
+{% block head %} {{ super() }} {% endblock %}
+{% block body %}
+<main class="container">
+  <section>
+    <h1>
+      Your Lists
+    </h1>
+    {% if lists %}
+    <p>Here are your lists:</p>
+    <ul>
+      {% for list in lists %}
+      <li>
+        <div><a href="{{ url_for("main.list", list_id=list.id) }}">{{ list.title }}</a> <a href="{{ url_for("main.delete_list", list_id=list.id) }}">[ delete? ]</a></div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+      <a href="{{ url_for("main.create") }}">Create a New list</a>
+  </section>
+</main>
+{% endblock %}

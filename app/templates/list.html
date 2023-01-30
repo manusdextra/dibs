@@ -4,9 +4,11 @@
 {% block body %}
 <main class="container">
   <section>
+    Title:
     <h1>
       {{ currentlist.title }}
     </h1>
+    <hr />
     <ul>
     {% for item in items %}
     <li>
@@ -15,7 +17,13 @@
     </li>
     {% endfor %}
     </ul>
+    <hr />
+  </section>
+  <section>
     <div>
+      <h3>
+      Add items
+      </h3>
     <form method="POST">
       {% for item in form %}
         {% if item.id != "csrf_token" %}
