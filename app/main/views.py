@@ -1,11 +1,12 @@
-from flask import abort, current_app, flash, render_template, session, redirect, url_for
-from flask_login import login_required
+from flask import abort, current_app, flash, redirect, render_template, session, url_for
+from flask_login import current_user, login_required
+
+from app import db
 from app.decorators import admin_required
 from app.email import send_email
+from app.main.forms import ItemForm, ListForm, NameForm
+from app.models import Item, List, Permission, User
 
-from app.main.forms import NameForm
-from app.models import User
-from app import db
 from . import main
 
 
@@ -35,6 +36,48 @@ def index():
         form=form,
         name=session.get("name"),
         known=session.get("known", False),
+    )
+
+
+@main.route("/create", methods=["GET", "POST"])
+@login_required
+def create():
+    form = ListForm()
+    if current_user.can(Permission.CREATE) and form.validate_on_submit():
+        newlist = List(
+            title=form.title.data,
+            author=current_user._get_current_object(),
+        )
+        db.session.add(newlist)
+        return redirect(url_for("main.index"))
+    lists = List.query.order_by(List.timestamp.desc()).all()
+    return render_template(
+        "create.html",
+        form=form,
+        lists=lists,
+    )
+
+
+@main.route("/read/<list_id>", methods=["GET", "POST"])
+@login_required
+def read(list_id):
+    form = ItemForm()
+    if current_user.can(Permission.READ) and form.validate_on_submit():
+        newitem = Item(
+            name=form.name.data,
+            link=form.link.data,
+            description=form.description.data,
+            list_id=list_id,
+        )
+        db.session.add(newitem)
+        return redirect(url_for("main.read", list_id=list_id))
+    currentlist = List.query.filter_by(id=list_id).first()
+    items = Item.query.filter_by(list_id=list_id).all()
+    return render_template(
+        "list.html",
+        currentlist=currentlist,
+        items=items,
+        form=form,
     )
 
 

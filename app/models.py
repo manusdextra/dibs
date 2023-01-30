@@ -19,7 +19,7 @@ class Permission:
     COMMENT = 0x02
     CREATE = 0x04
     DELETE = 0x08
-    ADMIN = 0xFF
+    ADMIN = 0x80
 
 
 class Role(db.Model):
@@ -58,6 +58,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    lists = db.relationship("List", backref="author", lazy="dynamic")
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -162,3 +163,35 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 login_manager.anonymous_user = AnonymousUser
+
+
+""" Custom models """
+
+
+class List(db.Model):
+    __tablename__ = "lists"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    items = db.relationship("Item", backref="list", lazy="dynamic")
+
+
+class Item(db.Model):
+    __tablename__ = "items"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text)
+    link = db.Column(db.Text)
+    description = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    list_id = db.Column(db.Integer, db.ForeignKey("lists.id"))
+    comments = db.relationship("Comment", backref="item", lazy="dynamic")
+
+
+class Comment(db.Model):
+    __tablename__ = "comments"
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id"))
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))

@@ -1,11 +1,26 @@
-{% extends "base.html" %} {% block title %}dibs - Index{% endblock %} {% block
-head %} {{ super() }} {% endblock %} {% block body %}
+{% extends "base.html" %} {% block title %}dibs - Index{% endblock %}
+{% block head %} {{ super() }} {% endblock %}
+{% block body %}
 <main class="container">
   <section id="Welcome">
     <h1>
+      Home
+    </h1>
+    <p>
       Hello, {% if current_user.is_authenticated %}{{
       current_user.username|capitalize }}{% else %}Stranger{% endif %}!
-    </h1>
+    </p>
+    {% if current_user.lists %}
+    <p>Here are your lists:</p>
+    <ul>
+      {% for list in current_user.lists %}
+      <li>
+        <a href="{{ url_for("main.read", list_id=list.id) }}">{{ list.title }}</a>
+      </li>
+      {% endfor %}
+    <li><a href="{{ url_for("main.create") }}">Create a New list</a></li>
+    </ul>
+    {% endif %}
   </section>
 </main>
 {% endblock %}

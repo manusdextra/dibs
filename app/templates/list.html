@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}dibs - {{ currentlist.title }}{% endblock %}
+{% block head %} {{ super() }} {% endblock %} 
+{% block body %}
+<main class="container">
+  <section>
+    <h1>
+      {{ currentlist.title }}
+    </h1>
+    <ul>
+    {% for item in items %}
+    <li>
+      <div><a href="{{ item.link }}">{{ item.name }}</a></div>
+      {% if item.description %}<div> {{ item.description }} </div>{% endif %}
+    </li>
+    {% endfor %}
+    </ul>
+    <div>
+    <form method="POST">
+      {% for item in form %}
+        {% if item.id != "csrf_token" %}
+        {{ item.label }}
+        {% endif %}
+        {{ item() }}
+      {% endfor %}
+      {% if form.errors %}
+          <ul class="errors">
+            Invalid input(s):
+          {% for error in form.errors %}
+              <li>{{ error }}</li>
+          {% endfor %}
+          </ul>
+      {% endif %}
+    </form>
+    </div>
+
+  </section>
+</main>
+{% endblock %}
