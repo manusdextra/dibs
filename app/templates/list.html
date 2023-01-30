@@ -9,10 +9,12 @@
       {{ currentlist.title }}
     </h1>
     <hr />
+    Items:
     <ul>
     {% for item in items %}
     <li>
-      <div><a href="{{ item.link }}">{{ item.name }}</a></div>
+      <div>
+        {% if item.link %}<a href="{{ item.link }}">{{ item.name }}</a>{% else %}{{ item.name }}{% endif %} <a href="{{ url_for("main.delete_item", list_id=currentlist.id, item_id=item.id) }}">[ delete? ]</a></div>
       {% if item.description %}<div> {{ item.description }} </div>{% endif %}
     </li>
     {% endfor %}

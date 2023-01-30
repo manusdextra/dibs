@@ -56,6 +56,7 @@ def create():
         form=form,
     )
 
+
 @main.route("/lists/", methods=["GET", "POST"])
 @login_required
 def lists():
@@ -64,10 +65,9 @@ def lists():
     """
     lists = List.query.filter_by(author_id=current_user.id).all()
     return render_template(
-            "lists.html",
-            lists=lists,
+        "lists.html",
+        lists=lists,
     )
-
 
 
 @main.route("/lists/<list_id>", methods=["GET", "POST"])
@@ -102,19 +102,36 @@ def delete_list(list_id):
     currentlist = List.query.filter_by(id=list_id).first()
     if current_user.can(Permission.DELETE):
         db.session.delete(currentlist)
-    flash(f" Your list \"{currentlist.title}\" has been deleted")
+    flash(f'Your list "{currentlist.title}" has been deleted')
     return redirect(url_for("main.lists"))
+
+
+@main.route("/lists/<list_id>/delete/<item_id>", methods=["GET", "POST"])
+@login_required
+def delete_item(list_id, item_id):
+    item = Item.query.filter_by(id=item_id).first()
+    if current_user.can(Permission.DELETE):
+        db.session.delete(item)
+    flash(f'The item "{item.name}" has been deleted')
+    return redirect(url_for("main.list", list_id=list_id))
 
 
 @main.route("/admin")
 @login_required
 @admin_required
 def for_admins_only():
+    """
+    For demonstration only.
+    Once user route has been augmented with Admin features, this can be deleted.
+    """
     return "Admins only"
 
 
 @main.route("/user/<username>")
 def user(username):
+    """
+    Profile page
+    """
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)

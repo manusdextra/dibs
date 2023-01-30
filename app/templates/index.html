@@ -7,10 +7,15 @@
       Home
     </h1>
     <p>
-      Hello, {% if current_user.is_authenticated %}{{
-      current_user.username|capitalize }}{% else %}Stranger{% endif %}!
+      Hello,
+      {% if current_user.is_authenticated %}{{
+      current_user.username|capitalize }}!
+      {% else %}
+      Stranger!
     </p>
-    <p>Have a look at your <a href="{{ url_for("main.lists")}}">lists</a></p>
+    <p>Please, sign in.
+    {% endif %}
+    </p>
   </section>
 </main>
 {% endblock %}
