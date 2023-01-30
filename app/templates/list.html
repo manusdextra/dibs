@@ -14,7 +14,7 @@
     {% for item in items %}
     <li>
       <div>
-        {% if item.link %}<a href="{{ item.link }}">{{ item.name }}</a>{% else %}{{ item.name }}{% endif %} <a href="{{ url_for("main.delete_item", list_id=currentlist.id, item_id=item.id) }}">[ delete? ]</a></div>
+        {% if item.link %}<a href="https://{{ item.link|safe }}">{{ item.name }}</a>{% else %}{{ item.name }}{% endif %} <a href="{{ url_for("main.delete_item", list_id=currentlist.id, item_id=item.id) }}">[ delete? ]</a></div>
       {% if item.description %}<div> {{ item.description }} </div>{% endif %}
     </li>
     {% endfor %}
