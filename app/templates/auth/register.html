@@ -4,19 +4,15 @@ dibs - Register
 {% endblock title %}
 
 {% block page_content %}
-  <h1>Register</h1>
+<h1>Register</h1>
   <div>
   <form method="POST">
-    {{ form.csrf_token }}
-    {{ form.username.label }}
-    {{ form.username() }}
-    {{ form.email.label }}
-    {{ form.email() }}
-    {{ form.password.label }}
-    {{ form.password() }}
-    {{ form.password2.label }}
-    {{ form.password2() }}
-    <input type="submit" value="OK" />
+    {% for item in form %}
+      {% if item.id != "csrf_token" %}
+      {{ item.label }}
+      {% endif %}
+      {{ item() }}
+    {% endfor %}
     {% if form.errors %}
         <ul class="errors">
           Invalid input(s):

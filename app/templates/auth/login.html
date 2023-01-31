@@ -4,18 +4,15 @@ dibs - Login
 {% endblock title %}
 
 {% block page_content %}
-<section id="register">
-  <h1>Login</h1>
+<h1>Login</h1>
   <div>
   <form method="POST">
-    {{ form.csrf_token }}
-    {{ form.email.label }}
-    {{ form.email() }}
-    {{ form.password.label }}
-    {{ form.password() }}
-    {{ form.remember_me.label }}
-    {{ form.remember_me() }}
-    <input type="submit" value="OK" />
+    {% for item in form %}
+      {% if item.id != "csrf_token" %}
+      {{ item.label }}
+      {% endif %}
+      {{ item() }}
+    {% endfor %}
     {% if form.errors %}
         <ul class="errors">
           Invalid input(s):
@@ -25,8 +22,7 @@ dibs - Login
         </ul>
     {% endif %}
   </form>
-  </div>
   <p>Forgot your password? <a href="{{url_for("auth.password_reset_request")}}">Click here to reset it</a></p>
   <p>New user? <a href="{{ url_for("auth.register")}}">Click here to register</a></p>
-</section>
+  </div>
 {% endblock page_content %}
