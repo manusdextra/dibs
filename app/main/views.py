@@ -4,8 +4,8 @@ from flask_login import current_user, login_required
 from app import db
 from app.decorators import admin_required
 from app.email import send_email
-from app.main.forms import ItemForm, ListForm, NameForm
-from app.models import Item, List, Permission, User
+from app.main.forms import ItemForm, ListForm, NameForm, UserEditForm
+from app.models import Item, List, Permission, Role, User
 
 from . import main
 
@@ -116,17 +116,6 @@ def delete_item(list_id, item_id):
     return redirect(url_for("main.list", list_id=list_id))
 
 
-@main.route("/admin")
-@login_required
-@admin_required
-def for_admins_only():
-    """
-    For demonstration only.
-    Once user route has been augmented with Admin features, this can be deleted.
-    """
-    return "Admins only"
-
-
 @main.route("/user/<username>")
 def user(username):
     """
@@ -136,3 +125,28 @@ def user(username):
     if user is None:
         abort(404)
     return render_template("user.html", user=user)
+
+
+@main.route("/user/<username>/edit", methods=["GET", "POST"])
+@login_required
+@admin_required
+def edit_user(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    form = UserEditForm(user=user)
+    if form.validate_on_submit():
+        user.email = form.email.data
+        user.username = form.username.data
+        user.confirmed = form.confirmed.data
+        user.role = Role.query.get(form.role.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('The profile has been updated.')
+        return redirect(url_for('main.user', username=user.username))
+    form.email.data = user.email
+    form.username.data = user.username
+    form.confirmed.data = user.confirmed
+    form.role.data = user.role_id
+    return render_template('edituser.html', form=form, user=user, username=user.username)
+

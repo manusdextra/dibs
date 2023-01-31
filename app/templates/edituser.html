@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %} dibs - Edit Profile {% endblock title %}
+
+{% block page_content %}
+<h1>Profile</h1>
+  <p>
+  Editing {{ user.username|capitalize }}'s profile
+  </p>
+  <div>
+  <form method="POST">
+    {% for item in form %}
+      {% if item.id != "csrf_token" %}
+      {{ item.label }}
+      {% endif %}
+      {{ item() }}
+    {% endfor %}
+    {% if form.errors %}
+        <ul class="errors">
+          Invalid input(s):
+        {% for error in form.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+  </form>
+  </div>
+
+  <hr />
+  <div>
+    Last seen {{ user.last_seen}}.
+  </div>
+{% endblock page_content %}
