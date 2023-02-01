@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-
 {% block title %}dibs - Confirm your account{% endblock %}
-
+{% block head %} {{ super() }} {% endblock %}
+{% block body %}
 {% block page_content %}
 <div class="page-header">
     <h1>
@@ -17,4 +17,5 @@
         <a href="{{ url_for('auth.resend_confirmation') }}">Click here</a>
     </p>
 </div>
+{% endblock %}
 {% endblock %}
