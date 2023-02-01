@@ -9,7 +9,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Length, Email, Regexp
 
-from app.models import Role, User
+from app.models import Category, Role, User
 
 
 class NameForm(FlaskForm):
@@ -25,11 +25,18 @@ class ItemForm(FlaskForm):
     name = StringField("Name: ", validators=[DataRequired()])
     link = StringField("URL: (optional)")
     description = TextAreaField("Description: (optional)")
+    category_id = SelectField("Category: ", coerce=int)
     submit = SubmitField("Add to List")
+
+    def __init__(self, *args, **kwargs):
+        super(ItemForm, self).__init__(*args, **kwargs)
+        self.category_id.choices = [
+            (category.id, category.name)
+            for category in Category.query.order_by(Category.id).all()
+        ]
 
 
 class UserEditForm(FlaskForm):
-
     email = StringField(
         "Email: ",
         validators=[
@@ -55,7 +62,6 @@ class UserEditForm(FlaskForm):
     submit = SubmitField("Submit")
 
     def __init__(self, user, *args, **kwargs):
-        self.user = user
         super(UserEditForm, self).__init__(*args, **kwargs)
         self.role.choices = [
             (role.id, role.name) for role in Role.query.order_by(Role.name).all()

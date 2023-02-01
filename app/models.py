@@ -177,6 +177,33 @@ class List(db.Model):
     items = db.relationship("Item", backref="list", lazy="dynamic")
 
 
+class Category(db.Model):
+    __tablename__ = "categories"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
+
+    @staticmethod
+    def insert_categories():
+        categories = [
+            ("Misc", True),
+            ("Books", False),
+            ("Music", False),
+            ("Gadgets", False),
+            ("Household", False),
+        ]
+        for c, default in categories:
+            category = Category.query.filter_by(name=c).first()
+            if category is None:
+                category = Category(name=c)
+            category.default = default
+            db.session.add(category)
+        db.session.commit()
+
+    def __repr__(self) -> str:
+        return "<Category %r>" % self.name
+
+
 class Item(db.Model):
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True)
@@ -185,6 +212,7 @@ class Item(db.Model):
     description = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     list_id = db.Column(db.Integer, db.ForeignKey("lists.id"))
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
     comments = db.relationship("Comment", backref="item", lazy="dynamic")
 
 

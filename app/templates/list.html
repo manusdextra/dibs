@@ -8,19 +8,39 @@
     <h1>
       {{ currentlist.title }}
     </h1>
+
     <hr />
-    Items:
+
+    {% for category in categories %}
+    <h4>{{ category.name }}</h4>
     <ul>
-    {% for item in items %}
-    <li>
-      <div>
-        {% if item.link %}<a href="https://{{ item.link|safe }}">{{ item.name }}</a>{% else %}{{ item.name }}{% endif %} <a href="{{ url_for("main.delete_item", list_id=currentlist.id, item_id=item.id) }}">[ delete? ]</a></div>
-      {% if item.description %}<div> {{ item.description }} </div>{% endif %}
-    </li>
-    {% endfor %}
+      {% for item in items %}
+      {% if item.category_id == category.id %}
+        <li>
+          <div>
+            {% if item.link %}
+            <a href="https://{{ item.link|safe }}">{{ item.name }}</a>
+            {% else %}
+            {{ item.name }}
+            {% endif %}
+            <a href="{{ url_for(
+              "main.delete_item",
+              list_id=currentlist.id,
+              item_id=item.id
+              )}}">
+              [ delete? ]</a>
+          </div>
+          {% if item.description %}<div> {{ item.description }} </div>{% endif %}
+        </li>
+        {% endif %}
+      {% endfor %}
     </ul>
     <hr />
+    {% endfor %}
+
   </section>
+
+  {# #}
   <section>
     <div>
       <h3>

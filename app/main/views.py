@@ -5,7 +5,7 @@ from app import db
 from app.decorators import admin_required
 from app.email import send_email
 from app.main.forms import ItemForm, ListForm, NameForm, UserEditForm
-from app.models import Item, List, Permission, Role, User
+from app.models import Category, Item, List, Permission, Role, User
 
 from . import main
 
@@ -76,22 +76,29 @@ def list(list_id):
     """
     Show a single list by ID
     """
-    form = ItemForm()
+    form = ItemForm(list_id=list_id)
     if current_user.can(Permission.READ) and form.validate_on_submit():
         newitem = Item(
             name=form.name.data,
             link=form.link.data,
             description=form.description.data,
+            category_id=form.category_id.data,
             list_id=list_id,
         )
         db.session.add(newitem)
         return redirect(url_for("main.list", list_id=list_id))
     currentlist = List.query.filter_by(id=list_id).first()
     items = Item.query.filter_by(list_id=list_id).all()
+    # show only those categories that have items in them
+    # TODO: this seems hacky, and potentially means a lot of
+    # individual db queries, which I'm sure is not a good idea
+    categories = [Category.query.filter_by(id=item.category_id).first() for item in items]
+
     return render_template(
         "list.html",
         currentlist=currentlist,
         items=items,
+        categories=categories,
         form=form,
     )
 
