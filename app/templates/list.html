@@ -4,10 +4,10 @@
 {% block body %}
 <main class="container">
   <section>
-    Title:
     <h1>
       {{ currentlist.title }}
     </h1>
+    <p>by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a></p>
 
     <hr />
 
