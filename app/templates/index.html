@@ -7,15 +7,20 @@
       Home
     </h1>
     <p>
-      Hello,
-      {% if current_user.is_authenticated %}{{
-      current_user.username|capitalize }}!
+      {% if not current_user.is_authenticated %}
+      Hello, Stranger! Welcome to dibs. To get started, please sign in or register. 
       {% else %}
-      Stranger!
+      Hello, {{ current_user.username|capitalize }}! <br />
+      {% if lists %}
+      Here are some lists that other people have created:
+      <ul>
+      {% for list in lists %}
+      <li><a href="{{ url_for("main.list", list_id=list.id) }}">{{ list.title|capitalize }}</a> created by "{{ list.author.username|capitalize }}"</li>
+      {% endfor %}
+      </ul>
+      {% endif %}
     </p>
-    <p>Please, sign in.
     {% endif %}
-    </p>
   </section>
 </main>
 {% endblock %}

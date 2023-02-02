@@ -12,34 +12,20 @@ from . import main
 
 @main.route("/", methods=["GET", "POST"])
 def index():
-    form = NameForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.name.data).first()
-        if user is None:
-            user = User(username=form.name.data)
-            db.session.add(user)
-            session["known"] = False
-            if current_app.config["DIBS_ADMIN"]:
-                send_email(
-                    current_app.config["DIBS_ADMIN"],
-                    "New User",
-                    "mail/newuser",
-                    user=user,
-                )
-        else:
-            session["known"] = True
-        session["name"] = form.name.data
-        form.name.data = ""
-        return redirect(url_for(".index"))
+    lists = List.query.all()
+
+    # TODO Is this best practice? It works but it feels wrong
+    for l in lists:
+        author = User.query.filter_by(id=l.author_id).first()
+        l.author = author
+
     return render_template(
         "index.html",
-        form=form,
-        name=session.get("name"),
-        known=session.get("known", False),
+        lists=lists,
     )
 
 
-@main.route("/create", methods=["GET", "POST"])
+@main.route("/lists/create", methods=["GET", "POST"])
 @login_required
 def create():
     form = ListForm()
@@ -54,19 +40,6 @@ def create():
     return render_template(
         "create.html",
         form=form,
-    )
-
-
-@main.route("/lists/", methods=["GET", "POST"])
-@login_required
-def lists():
-    """
-    Show lists you have created yourself
-    """
-    lists = List.query.filter_by(author_id=current_user.id).all()
-    return render_template(
-        "lists.html",
-        lists=lists,
     )
 
 
@@ -110,7 +83,7 @@ def delete_list(list_id):
     if current_user.can(Permission.DELETE):
         db.session.delete(currentlist)
     flash(f'Your list "{currentlist.title}" has been deleted')
-    return redirect(url_for("main.lists"))
+    return redirect(url_for("main.profile", username=current_user.username))
 
 
 @main.route("/lists/<list_id>/delete/<item_id>", methods=["GET", "POST"])
@@ -124,20 +97,36 @@ def delete_item(list_id, item_id):
 
 
 @main.route("/user/<username>")
-def user(username):
+def profile(username):
     """
-    Profile page
+    User profile, shows their lists
     """
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    return render_template("user.html", user=user)
+    lists = List.query.filter_by(author_id=user.id).all()
+    return render_template("profile.html", user=user, lists=lists)
+
+
+@main.route("/user/<username>/settings")
+@login_required
+def settings(username):
+    """
+    Settings page
+    """
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    return render_template("settings.html", user=user)
 
 
 @main.route("/user/<username>/edit", methods=["GET", "POST"])
 @login_required
 @admin_required
 def edit_user(username):
+    """
+    Admin interface for each user
+    """
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)

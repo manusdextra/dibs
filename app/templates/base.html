@@ -13,14 +13,16 @@
     {% block navbar %}
     <nav>
     <ul>
+      {% if current_user.is_authenticated %}
       <li><a href="{{url_for("main.index")}}">Home</a></li>
-      <li><a href="{{url_for("main.lists")}}">My Lists</a></li>
+      <li><a href="{{url_for("main.profile", username=current_user.username)}}">Profile</a></li>
     </ul>
     <ul>
-      {% if current_user.is_authenticated %}
-      <li><a href="{{url_for("main.user", username=current_user.username)}}">Profile</a></li>
+      <li><a href="{{url_for("main.settings", username=current_user.username)}}">Settings</a></li>
       <li><a href="{{url_for("auth.logout")}}">Sign Out</a></li>
       {% else %}
+    </ul>
+    <ul>
       <li><a href="{{url_for("auth.login")}}">Sign In</a></li>
       {% endif %}
     </ul>

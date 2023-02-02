@@ -41,6 +41,7 @@
   </section>
 
   {# #}
+  {% if user == current_user %}
   <section>
     <div>
       <h3>
@@ -63,7 +64,8 @@
       {% endif %}
     </form>
     </div>
-
   </section>
+  {% endif %}
+
 </main>
 {% endblock %}

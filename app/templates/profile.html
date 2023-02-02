@@ -1,13 +1,12 @@
 {% extends "base.html" %} {% block title %}dibs - Your Lists{% endblock %}
 {% block head %} {{ super() }} {% endblock %}
-{% block body %}
-<main class="container">
-  <section>
+
+{% block page_content %}
     <h1>
-      Your Lists
+      {{ user.username|capitalize }}'s Lists
     </h1>
+
     {% if lists %}
-    <p>Here are your lists:</p>
     <ul>
       {% for list in lists %}
       <li>
@@ -16,7 +15,17 @@
       {% endfor %}
     </ul>
     {% endif %}
+
+    {% if user == current_user %}
+    <div>
       <a href="{{ url_for("main.create") }}">Create a New list</a>
-  </section>
-</main>
-{% endblock %}
+    </div>
+    {% else %}
+    <div>
+      {{ user.username|capitalize }} was last seen {{ user.last_seen}}.
+    </div>
+    {% endif %}
+
+    {% if current_user.is_administrator() %}<a href="{{ url_for("main.edit_user", username=user.username) }}">Edit User</a> (admin){% endif %}
+
+{% endblock  page_content %}
