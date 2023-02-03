@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% from "form.html" import formbase %}
+
 {% block title %}dibs - {{ currentlist.title }}{% endblock %}
 {% block head %} {{ super() }} {% endblock %} 
 {% block page_content %}
@@ -52,22 +54,7 @@
       <h3>
       Add items
       </h3>
-    <form method="POST">
-      {% for item in form %}
-        {% if item.id != "csrf_token" %}
-        {{ item.label }}
-        {% endif %}
-        {{ item() }}
-      {% endfor %}
-      {% if form.errors %}
-          <ul class="errors">
-            Invalid input(s):
-          {% for error in form.errors %}
-              <li>{{ error }}</li>
-          {% endfor %}
-          </ul>
-      {% endif %}
-    </form>
+      {{ formbase(form) }}
     </div>
   </section>
   {% endif %}
