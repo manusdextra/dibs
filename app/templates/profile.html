@@ -2,9 +2,13 @@
 {% block head %} {{ super() }} {% endblock %}
 
 {% block page_content %}
+<hgroup>
     <h1>
       {{ user.username|capitalize }}'s Lists
     </h1>
+    {% if current_user.is_administrator() %}[ <a href="{{ url_for("main.edit_user", username=user.username) }}">Edit User</a>{% endif %} ]
+</hgroup>
+
 
     {% if lists %}
     <ul>
@@ -12,9 +16,17 @@
       <li>
         <div>
           <a href="{{ url_for("main.list", list_id=list.id) }}">{{ list.title }}</a>
+          {#
+            I have disabled this for now. 
+            If people have already commented on the list,
+            it shouldn't be possible to delete it. 
+          #}
+
+          {#
           {% if user == current_user %}
           <a href="{{ url_for("main.delete_list", list_id=list.id) }}">[ delete? ]</a>
           {% endif %}
+          #}
         </div>
       </li>
       {% endfor %}
@@ -25,12 +37,12 @@
     <div>
       <a href="{{ url_for("main.create") }}">Create a New list</a>
     </div>
-    {% else %}
-    <div>
-      {{ user.username|capitalize }} was last seen {{ user.last_seen}}.
-    </div>
     {% endif %}
 
-    {% if current_user.is_administrator() %}<a href="{{ url_for("main.edit_user", username=user.username) }}">Edit User</a> (admin){% endif %}
-
 {% endblock  page_content %}
+
+{% block footer %}
+{% if user != current_user %}
+      {{ user.username|capitalize }} was last seen {{ user.last_seen}}.
+{% endif %}
+{% endblock footer %}
