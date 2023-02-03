@@ -84,7 +84,9 @@ def delete_list(list_id):
     currentlist = List.query.filter_by(id=list_id).first()
     if current_user.can(Permission.DELETE):
         db.session.delete(currentlist)
-    flash(f'Your list "{currentlist.title}" has been deleted')
+        flash(f'Your list "{currentlist.title}" has been deleted')
+    else:
+        flash("Sorry, you're not allowed to do that.")
     return redirect(url_for("main.profile", username=current_user.username))
 
 
