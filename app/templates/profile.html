@@ -10,7 +10,12 @@
     <ul>
       {% for list in lists %}
       <li>
-        <div><a href="{{ url_for("main.list", list_id=list.id) }}">{{ list.title }}</a> <a href="{{ url_for("main.delete_list", list_id=list.id) }}">[ delete? ]</a></div>
+        <div>
+          <a href="{{ url_for("main.list", list_id=list.id) }}">{{ list.title }}</a>
+          {% if user == current_user %}
+          <a href="{{ url_for("main.delete_list", list_id=list.id) }}">[ delete? ]</a>
+          {% endif %}
+        </div>
       </li>
       {% endfor %}
     </ul>
