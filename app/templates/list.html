@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 {% block title %}dibs - {{ currentlist.title }}{% endblock %}
 {% block head %} {{ super() }} {% endblock %} 
-{% block body %}
+{% block page_content %}
 <main class="container">
-  <section>
+  <hgroup>
     <h1>
       {{ currentlist.title }}
     </h1>
-    <p>by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a></p>
+    <h2>by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a></h2>
+  </hgroup>
 
-    <hr />
-
+  <section>
+  {% if items %}
     {% for category in categories %}
     <h4>{{ category.name }}</h4>
     <ul>
@@ -37,7 +38,11 @@
     </ul>
     <hr />
     {% endfor %}
-
+  {% else %}
+  <p>
+  This list is empty. {% if user == current_user %}Scroll down to add things to it.{% endif %}
+  </p>
+  {% endif %}
   </section>
 
   {# #}
@@ -67,5 +72,8 @@
   </section>
   {% endif %}
 
+  {% if current_user.is_administrator() %}
+  <a href="{{url_for("main.delete_list", list_id=currentlist.id)}}">Delete this list</a>
+  {% endif %}
 </main>
 {% endblock %}
