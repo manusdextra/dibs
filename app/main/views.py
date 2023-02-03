@@ -61,6 +61,7 @@ def list(list_id):
         db.session.add(newitem)
         return redirect(url_for("main.list", list_id=list_id))
     currentlist = List.query.filter_by(id=list_id).first()
+    user = User.query.filter_by(id=currentlist.author_id).first()
     items = Item.query.filter_by(list_id=list_id).all()
     # show only those categories that have items in them
     # TODO: this seems hacky, and potentially means a lot of
@@ -70,6 +71,7 @@ def list(list_id):
     return render_template(
         "list.html",
         currentlist=currentlist,
+        user=user,
         items=items,
         categories=categories,
         form=form,
