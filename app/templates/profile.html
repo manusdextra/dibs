@@ -8,8 +8,11 @@
     <h1>
       Lists
     </h1>
-    {% if current_user.is_administrator() %}[ <a href="{{ url_for("main.edit_user", username=user.username) }}">Edit User</a> ]{% endif %}
-    <h2>Created by {{ user.username|capitalize }}</h2>
+    <h2>Created by {{ user.username|capitalize }}
+      {% if current_user.is_administrator() %}
+      [ <a href="{{ url_for("main.edit_user", username=user.username) }}">Edit User</a> ]
+      {% endif %}
+    </h2>
 </hgroup>
 
 
