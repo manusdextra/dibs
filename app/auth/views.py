@@ -1,4 +1,5 @@
 from flask import flash, redirect, render_template, request, url_for
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app.auth.forms import (
@@ -25,14 +26,14 @@ def before_request():
 
 
 @auth.route("/unconfirmed")
-def unconfirmed():
+def unconfirmed() -> ResponseReturnValue:
     if current_user.is_anonymous or current_user.confirmed:
         return redirect("main.index")
     return render_template("auth/unconfirmed.html")
 
 
 @auth.route("/login", methods=["GET", "POST"])
-def login():
+def login() -> ResponseReturnValue:
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -45,14 +46,14 @@ def login():
 
 @auth.route("/logout")
 @login_required
-def logout():
+def logout() -> ResponseReturnValue:
     logout_user()
     flash("You have been logged out.")
     return redirect(url_for("main.index"))
 
 
 @auth.route("/register", methods=["GET", "POST"])
-def register():
+def register() -> ResponseReturnValue:
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(
@@ -77,7 +78,7 @@ def register():
 
 @auth.route("/confirm/<token>")
 @login_required
-def confirm(token):
+def confirm(token) -> ResponseReturnValue:
     if current_user.confirmed:
         return redirect(url_for("main.index"))
     if current_user.confirm(token):
@@ -89,7 +90,7 @@ def confirm(token):
 
 @auth.route("/confirm")
 @login_required
-def resend_confirmation():
+def resend_confirmation() -> ResponseReturnValue:
     token = current_user.generate_confirmation_token()
     send_email(
         current_user.email,
@@ -104,7 +105,7 @@ def resend_confirmation():
 
 @auth.route("/change-password", methods=["GET", "POST"])
 @login_required
-def change_password():
+def change_password() -> ResponseReturnValue:
     form = ChangePasswordForm()
     if form.validate_on_submit():
         if current_user.verify_password(form.old_password.data):
@@ -119,7 +120,7 @@ def change_password():
 
 
 @auth.route("/reset", methods=["GET", "POST"])
-def password_reset_request():
+def password_reset_request() -> ResponseReturnValue:
     if not current_user.is_anonymous:
         return redirect(url_for("main.index"))
     form = PasswordResetRequestForm()
@@ -142,7 +143,7 @@ def password_reset_request():
 
 
 @auth.route("/reset/<token>", methods=["GET", "POST"])
-def password_reset(token):
+def password_reset(token) -> ResponseReturnValue:
     if not current_user.is_anonymous:
         return redirect(url_for("main.index"))
     form = PasswordResetForm()
@@ -158,7 +159,7 @@ def password_reset(token):
 
 @auth.route('/change_email', methods=['GET', 'POST'])
 @login_required
-def change_email_request():
+def change_email_request() -> ResponseReturnValue:
     form = ChangeEmailForm()
     if form.validate_on_submit():
         if current_user.verify_password(form.password.data):
@@ -177,7 +178,7 @@ def change_email_request():
 
 @auth.route('/change_email/<token>')
 @login_required
-def change_email(token):
+def change_email(token) -> ResponseReturnValue:
     if current_user.change_email(token):
         db.session.commit()
         flash('Your email address has been updated.')

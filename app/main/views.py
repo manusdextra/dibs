@@ -1,4 +1,5 @@
 from flask import abort, current_app, flash, redirect, render_template, session, url_for
+from flask.typing import ResponseReturnValue
 from flask_login import current_user, login_required
 
 from app import db
@@ -11,7 +12,7 @@ from . import main
 
 
 @main.route("/", methods=["GET", "POST"])
-def index():
+def index() -> ResponseReturnValue:
     lists = List.query.all()
 
     # TODO Is this best practice? It works but it feels wrong
@@ -27,7 +28,7 @@ def index():
 
 @main.route("/lists/create", methods=["GET", "POST"])
 @login_required
-def create():
+def create() -> ResponseReturnValue:
     form = ListForm()
     if current_user.can(Permission.CREATE) and form.validate_on_submit():
         newlist = List(
@@ -45,7 +46,7 @@ def create():
 
 @main.route("/lists/<list_id>", methods=["GET", "POST"])
 @login_required
-def list(list_id):
+def list(list_id) -> ResponseReturnValue:
     """
     Show a single list by ID
     """
@@ -80,7 +81,7 @@ def list(list_id):
 
 @main.route("/lists/<list_id>/delete", methods=["GET", "POST"])
 @login_required
-def delete_list(list_id):
+def delete_list(list_id) -> ResponseReturnValue:
     currentlist = List.query.filter_by(id=list_id).first()
     if current_user.can(Permission.DELETE):
         db.session.delete(currentlist)
@@ -92,7 +93,7 @@ def delete_list(list_id):
 
 @main.route("/lists/<list_id>/delete/<item_id>", methods=["GET", "POST"])
 @login_required
-def delete_item(list_id, item_id):
+def delete_item(list_id, item_id) -> ResponseReturnValue:
     item = Item.query.filter_by(id=item_id).first()
     if current_user.can(Permission.DELETE):
         db.session.delete(item)
@@ -101,7 +102,7 @@ def delete_item(list_id, item_id):
 
 
 @main.route("/user/<username>")
-def profile(username):
+def profile(username) -> ResponseReturnValue:
     """
     User profile, shows their lists
     """
@@ -114,7 +115,7 @@ def profile(username):
 
 @main.route("/user/<username>/settings")
 @login_required
-def settings(username):
+def settings(username) -> ResponseReturnValue:
     """
     Settings page
     """
@@ -127,7 +128,7 @@ def settings(username):
 @main.route("/user/<username>/edit", methods=["GET", "POST"])
 @login_required
 @admin_required
-def edit_user(username):
+def edit_user(username) -> ResponseReturnValue:
     """
     Admin interface for each user
     """
@@ -149,4 +150,3 @@ def edit_user(username):
     form.confirmed.data = user.confirmed
     form.role.data = user.role_id
     return render_template('edituser.html', form=form, user=user, username=user.username)
-
