@@ -30,6 +30,7 @@
       </li>
       {% endfor %}
       </ul>
+      You can find your own lists on your <a href="{{ url_for("main.profile", username=current_user.username) }}">profile</a>
       {% endif %}
     </p>
     {% endif %}

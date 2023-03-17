@@ -13,17 +13,21 @@ from . import main
 
 @main.route("/", methods=["GET", "POST"])
 def index() -> ResponseReturnValue:
-    lists = List.query.all()
+    if current_user is None:
+        return render_template("index.html")
+    else:
+        user = User.query.filter_by(username=current_user.username).first()
+        lists = List.query.filter(List.author_id != user.id).all()
 
-    # TODO Is this best practice? It works but it feels wrong
-    for l in lists:
-        author = User.query.filter_by(id=l.author_id).first()
-        l.author = author
+        # TODO Is this best practice? It works but it feels wrong
+        for l in lists:
+            author = User.query.filter_by(id=l.author_id).first()
+            l.author = author
 
-    return render_template(
-        "index.html",
-        lists=lists,
-    )
+        return render_template(
+            "index.html",
+            lists=lists,
+        )
 
 
 @main.route("/lists/create", methods=["GET", "POST"])
@@ -67,7 +71,9 @@ def list(list_id) -> ResponseReturnValue:
     # show only those categories that have items in them
     # TODO: this seems hacky, and potentially means a lot of
     # individual db queries, which I'm sure is not a good idea
-    categories = [Category.query.filter_by(id=item.category_id).first() for item in items]
+    categories = [
+        Category.query.filter_by(id=item.category_id).first() for item in items
+    ]
 
     return render_template(
         "list.html",
@@ -143,10 +149,12 @@ def edit_user(username) -> ResponseReturnValue:
         user.role = Role.query.get(form.role.data)
         db.session.add(user)
         db.session.commit()
-        flash('The profile has been updated.')
-        return redirect(url_for('main.user', username=user.username))
+        flash("The profile has been updated.")
+        return redirect(url_for("main.user", username=user.username))
     form.email.data = user.email
     form.username.data = user.username
     form.confirmed.data = user.confirmed
     form.role.data = user.role_id
-    return render_template('edituser.html', form=form, user=user, username=user.username)
+    return render_template(
+        "edituser.html", form=form, user=user, username=user.username
+    )
