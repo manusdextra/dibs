@@ -93,7 +93,7 @@ def delete_list(list_id) -> ResponseReturnValue:
         db.session.delete(currentlist)
         flash(f'Your list "{currentlist.title}" has been deleted')
     else:
-        flash("Sorry, you're not allowed to do that.")
+        flash(f"Sorry, you can't delete anything. People might have called dibs on it")
     return redirect(url_for("main.profile", username=current_user.username))
 
 
@@ -103,7 +103,9 @@ def delete_item(list_id, item_id) -> ResponseReturnValue:
     item = Item.query.filter_by(id=item_id).first()
     if current_user.can(Permission.DELETE):
         db.session.delete(item)
-    flash(f'The item "{item.name}" has been deleted')
+        flash(f'The item "{item.name}" has been deleted')
+    else:
+        flash(f"Sorry, you can't delete anything. People might have called dibs on it")
     return redirect(url_for("main.list", list_id=list_id))
 
 
