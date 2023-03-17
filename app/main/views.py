@@ -13,9 +13,7 @@ from . import main
 
 @main.route("/", methods=["GET", "POST"])
 def index() -> ResponseReturnValue:
-    if current_user is None:
-        return render_template("index.html")
-    else:
+    if current_user.is_authenticated:
         user = User.query.filter_by(username=current_user.username).first()
         lists = List.query.filter(List.author_id != user.id).all()
 
@@ -28,6 +26,8 @@ def index() -> ResponseReturnValue:
             "index.html",
             lists=lists,
         )
+    else:
+        return render_template("index.html")
 
 
 @main.route("/lists/create", methods=["GET", "POST"])
