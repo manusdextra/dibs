@@ -26,12 +26,16 @@
             {% else %}
             {{ item.name }}
             {% endif %}
+
+            {% if current_user.role_id == 2 %}
             <a href="{{ url_for(
               "main.delete_item",
               list_id=currentlist.id,
               item_id=item.id
               )}}">
               [ delete? ]</a>
+            {% endif %}
+
           </div>
           {% if item.description %}<div> {{ item.description }} </div>{% endif %}
         </li>
