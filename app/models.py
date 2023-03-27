@@ -68,13 +68,16 @@ class User(UserMixin, db.Model):
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
 
+    def __repr__(self) -> str:
+        return "<User %r>" % self.username
+
     def ping(self):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
     @property
     def password(self) -> None:
-        raise AttributeError("password is not a readbale attribute")
+        raise AttributeError("password is not a readable attribute")
 
     @password.setter
     def password(self, password) -> None:
@@ -150,9 +153,6 @@ class User(UserMixin, db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
-
-    def __repr__(self) -> str:
-        return "<User %r>" % self.username
 
 
 class AnonymousUser(AnonymousUserMixin):
