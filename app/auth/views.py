@@ -135,9 +135,7 @@ def password_reset_request() -> ResponseReturnValue:
                 user=user,
                 token=token,
             )
-        flash(
-            "An email with instructions to reset your password has been " "sent to you."
-        )
+        flash("An email with instructions to reset your password has been sent to you.")
         return redirect(url_for("auth.login"))
     return render_template("auth/reset_password.html", form=form)
 
@@ -157,7 +155,7 @@ def password_reset(token) -> ResponseReturnValue:
     return render_template("auth/reset_password.html", form=form)
 
 
-@auth.route('/change_email', methods=['GET', 'POST'])
+@auth.route("/change_email", methods=["GET", "POST"])
 @login_required
 def change_email_request() -> ResponseReturnValue:
     form = ChangeEmailForm()
@@ -165,23 +163,29 @@ def change_email_request() -> ResponseReturnValue:
         if current_user.verify_password(form.password.data):
             new_email = form.email.data.lower()
             token = current_user.generate_email_change_token(new_email)
-            send_email(new_email, 'Confirm your email address',
-                       'auth/email/change_email',
-                       user=current_user, token=token)
-            flash('An email with instructions to confirm your new email '
-                  'address has been sent to you.')
-            return redirect(url_for('main.index'))
+            send_email(
+                new_email,
+                "Confirm your email address",
+                "auth/email/change_email",
+                user=current_user,
+                token=token,
+            )
+            flash(
+                "An email with instructions to confirm your new email "
+                "address has been sent to you."
+            )
+            return redirect(url_for("main.index"))
         else:
-            flash('Invalid email or password.')
+            flash("Invalid email or password.")
     return render_template("auth/change_email.html", form=form)
 
 
-@auth.route('/change_email/<token>')
+@auth.route("/change_email/<token>")
 @login_required
 def change_email(token) -> ResponseReturnValue:
     if current_user.change_email(token):
         db.session.commit()
-        flash('Your email address has been updated.')
+        flash("Your email address has been updated.")
     else:
-        flash('Invalid request.')
-    return redirect(url_for('main.index'))
+        flash("Invalid request.")
+    return redirect(url_for("main.index"))

@@ -111,7 +111,8 @@ class User(UserMixin, db.Model):
         s = Serializer(current_app.config["SECRET_KEY"])
         try:
             data = s.loads(token)
-        except:
+        except Exception as e:
+            print(e)
             return False
         user = User.query.get(data.get("reset"))
         if user is None:
