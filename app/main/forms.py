@@ -81,3 +81,8 @@ class UserEditForm(FlaskForm):
             and User.query.filter_by(username=field.data).first()
         ):
             raise ValidationError("Username already in use")
+
+
+class CommentForm(FlaskForm):
+    body = TextAreaField("Comment: ", validators=[DataRequired()])
+    submit = SubmitField("Add Comment")

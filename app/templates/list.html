@@ -16,6 +16,7 @@
   {% if items %}
     {% for category in categories %}
     <h4>{{ category.name }}</h4>
+    <hr />
     <ul>
       {% for item in items %}
       {% if item.category_id == category.id %}
@@ -27,6 +28,29 @@
             {{ item.name }}
             {% endif %}
 
+            {% if current_user.id != currentlist.author.id %}
+                {% if comments %}
+              <ul>
+                {% for comment in comments %}
+                {% if comment.item_id == item.id %}
+                  <blockquote>{{ comment.body }}<footer><cite>—{{ comment.author | capitalize }}</cite></footer></blockquote>
+                  
+                {% endif %}
+                {% endfor %}
+              </ul>
+                {% endif %}
+            <details>
+              <summary>Add a Comment </summary>
+                {% set action = url_for('main.add_comment', list_id=currentlist.id, item_id=item.id) %}
+                  {{ formbase(commentform, action=action) }}
+                  {#
+                  <a href="{{ url_for("main.add_comment", list_id=currentlist.id, item_id=item.id) }}">Add a comment</a>
+                  #}
+            </details>
+            {% endif %}
+          </div>
+          {% if item.description %}<div> {{ item.description }} </div>{% endif %}
+
             {% if current_user.role_id == 2 %}
             <a href="{{ url_for(
               "main.delete_item",
@@ -36,13 +60,10 @@
               [ delete? ]</a>
             {% endif %}
 
-          </div>
-          {% if item.description %}<div> {{ item.description }} </div>{% endif %}
         </li>
         {% endif %}
       {% endfor %}
     </ul>
-    <hr />
     {% endfor %}
   {% else %}
   <p>
@@ -58,7 +79,7 @@
       <h3>
       Add items
       </h3>
-      {{ formbase(form) }}
+      {{ formbase(itemform) }}
     </div>
   </section>
   {% endif %}

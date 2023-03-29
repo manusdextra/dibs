@@ -19,7 +19,7 @@ class Permission:
     COMMENT = 0x02
     CREATE = 0x04
     DELETE = 0x08
-    ADMIN = 0x80
+    ADMIN = 0xFF
 
 
 class Role(db.Model):
@@ -222,5 +222,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    list_id = db.Column(db.Integer, db.ForeignKey("lists.id"))
     item_id = db.Column(db.Integer, db.ForeignKey("items.id"))
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    author = db.Column(db.String, db.ForeignKey("users.username"))

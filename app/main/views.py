@@ -5,8 +5,8 @@ from flask_login import current_user, login_required
 from app import db
 from app.decorators import admin_required
 from app.email import send_email
-from app.main.forms import ItemForm, ListForm, NameForm, UserEditForm
-from app.models import Category, Item, List, Permission, Role, User
+from app.main.forms import CommentForm, ItemForm, ListForm, NameForm, UserEditForm
+from app.models import Category, Comment, Item, List, Permission, Role, User
 
 from . import main
 
@@ -54,13 +54,13 @@ def list(list_id) -> ResponseReturnValue:
     """
     Show a single list by ID
     """
-    form = ItemForm(list_id=list_id)
-    if current_user.can(Permission.READ) and form.validate_on_submit():
+    itemform = ItemForm(list_id=list_id)
+    if current_user.can(Permission.READ) and itemform.validate_on_submit():
         newitem = Item(
-            name=form.name.data,
-            link=form.link.data,
-            description=form.description.data,
-            category_id=form.category_id.data,
+            name=itemform.name.data,
+            link=itemform.link.data,
+            description=itemform.description.data,
+            category_id=itemform.category_id.data,
             list_id=list_id,
         )
         db.session.add(newitem)
@@ -74,6 +74,8 @@ def list(list_id) -> ResponseReturnValue:
     categories = [
         Category.query.filter_by(id=item.category_id).first() for item in items
     ]
+    comments = Comment.query.filter_by(list_id=list_id).all()
+    commentform = CommentForm(list_id=list_id)
 
     return render_template(
         "list.html",
@@ -81,7 +83,9 @@ def list(list_id) -> ResponseReturnValue:
         user=user,
         items=items,
         categories=categories,
-        form=form,
+        itemform=itemform,
+        comments=comments,
+        commentform=commentform,
     )
 
 
@@ -106,6 +110,25 @@ def delete_item(list_id, item_id) -> ResponseReturnValue:
         flash(f'The item "{item.name}" has been deleted')
     else:
         flash(f"Sorry, you can't delete anything. People might have called dibs on it")
+    return redirect(url_for("main.list", list_id=list_id))
+
+
+@main.route("/lists/<list_id>/addcomment/<item_id>", methods=["POST"])
+@login_required
+def add_comment(list_id, item_id) -> ResponseReturnValue:
+    item = Item.query.filter_by(id=item_id).first()
+    form = CommentForm()
+    if current_user.can(Permission.COMMENT) and form.validate_on_submit():
+        comment = Comment(
+            body=form.body.data,
+            list_id=list_id,
+            item_id=item_id,
+            author_id=current_user.id,
+            author=current_user.username,
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash("Your comment has been added")
     return redirect(url_for("main.list", list_id=list_id))
 
 

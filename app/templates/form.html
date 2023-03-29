@@ -1,28 +1,20 @@
-{% macro formbase(form) %}
-<form method="POST">
-  {% if form.errors %}
-  Invalid input(s):
+{% macro formbase(form, action=None) %} {% if action %}
+<form method="POST" action="{{ action }}">
+  {% else %}
+  <form method="POST">
+    {% endif %} {% if form.errors %} Invalid input(s):
     <ul class="errors">
-    {% for error in form.errors %}
-        <li>{{ error }}</li>
-    {% endfor %}
+      {% for error in form.errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
     </ul>
-  {% endif %}
-
-  {% for item in form %}
-  <fieldset id="{{item.id}}">
-    {% if item.id == "csrf_token" %}
-    {{ item() }}
-    {% elif item.id == "remember_me" %}
-    {{ item() }}
-    {{ item.label }}
-    {% elif item.id == "submit" %}
-    {{ item() }}
-    {% else %}
-    {{ item.label }}
-    {{ item() }}
-    {% endif %}
-  </fieldset>
-  {% endfor %}
+    {% endif %} {% for item in form %}
+    <fieldset id="{{item.id}}">
+      {% if item.id == "csrf_token" %} {{ item() }} {% elif item.id ==
+      "remember_me" %} {{ item() }} {{ item.label }} {% elif item.id == "submit"
+      %} {{ item() }} {% else %} {{ item.label }} {{ item() }} {% endif %}
+    </fieldset>
+    {% endfor %}
+  </form>
+  {% endmacro %}
 </form>
-{% endmacro %}
