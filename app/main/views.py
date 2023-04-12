@@ -66,25 +66,31 @@ def list(list_id) -> ResponseReturnValue:
         db.session.add(newitem)
         return redirect(url_for("main.list", list_id=list_id))
     currentlist = List.query.filter_by(id=list_id).first()
-    user = User.query.filter_by(id=currentlist.author_id).first()
-    items = Item.query.filter_by(list_id=list_id).all()
-    # show only those categories that have items in them
-    # TODO: this seems hacky, and potentially means a lot of
-    # individual db queries, which I'm sure is not a good idea
-    categories = [
-        Category.query.filter_by(id=item.category_id).first() for item in items
-    ]
+    author = User.query.filter_by(id=currentlist.author_id).first()
+    categories = Category.query.all()
     comments = Comment.query.filter_by(list_id=list_id).all()
+    items_query = Item.query.filter_by(list_id=currentlist.id).all()
+    items = []
+    for item in items_query:
+        items.append(
+            {
+                "id": item.id,
+                "name": item.name,
+                "description": item.description,
+                "category": [x.name for x in categories if x.id == item.category_id],
+                "comments": [x for x in comments if x.item_id == item.id],
+            }
+        )
+
     commentform = CommentForm(list_id=list_id)
 
     return render_template(
         "list.html",
         currentlist=currentlist,
-        user=user,
+        author=author,
         items=items,
         categories=categories,
         itemform=itemform,
-        comments=comments,
         commentform=commentform,
     )
 
