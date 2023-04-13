@@ -70,17 +70,21 @@ def list(list_id) -> ResponseReturnValue:
     categories = Category.query.all()
     comments = Comment.query.filter_by(list_id=list_id).all()
     items_query = Item.query.filter_by(list_id=currentlist.id).all()
-    items = []
-    for item in items_query:
-        items.append(
+    items = {
+        category.name: [
             {
                 "id": item.id,
                 "name": item.name,
                 "description": item.description,
-                "category": [x.name for x in categories if x.id == item.category_id],
-                "comments": [x for x in comments if x.item_id == item.id],
+                "comments": [
+                    comment for comment in comments if comment.item_id == item.id
+                ],
             }
-        )
+            for item in items_query
+            if item.category_id == category.id
+        ]
+        for category in categories
+    }
 
     commentform = CommentForm(list_id=list_id)
 

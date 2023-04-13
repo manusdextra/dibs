@@ -10,18 +10,19 @@
   This enables showing and hiding comment sections.
   It depends on individually marked elements using the item identifier.
   #}
-  {% if items %}
   <style type="text/css" media="screen">
   input[type=checkbox] { display: none }
-  {% for item in items %}
-  section input#expand{{item.id}}:not(:checked) ~ table tbody tr#comments{{item.id}} { display: none }
+  {% for category in items %}{% if items[category] %}
+  {% for item in items[category] %}
+  input#expand{{item.id}}:not(:checked) ~ div#comments{{item.id}} { display: none }
   {% endfor %}
+  {% endif %}{% endfor %}
   </style>
-  {% endif %}
 
 {% endblock %}
+
 {% block page_content %}
-<main class="container">
+<main>
 <hgroup>
   <h1>
     {{ currentlist.title }}
@@ -29,74 +30,58 @@
   <h2>by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a></h2>
 </hgroup>
 
+<p>Click on individual items to comment on them.</p>
+
 <section>
 
 {% if items %}
-<table role="grid">
-  <thead>
-    <tr>
-      <td>#</td>
-      <td>Title</td>
-      <td>Description</td>
-      <td>Category</td>
-      <td>Expand</td>
-    </tr>
-  </thead>
-  <tbody class="items">
-    {% for item in items %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td>
-        {% if item.link %}
-        <a href="https://{{ item.link|safe }}">{{ item.name }}</a>
-        {% else %}
-        {{ item.name }}
-        {% endif %}
-        {% if current_user.is_administrator %}
-        <a href="{{ url_for(
-          "main.delete_item",
-          list_id=currentlist.id,
-          item_id=item.id
-        )}}">
-          [ delete? ]</a>
-        {% endif %}
-      </td>
-      <td>{{item.description}}</td>
-      <td>{{item.category | last}}</td>
-      <td>
-        <label for="expand{{item.id}}">Expand</label>
-      </td>
-    </tr>
 
-    {# comments #}
-    <input class="folder" id="expand{{item.id}}" type="checkbox" />
-    {% if current_user.id != currentlist.author.id %}
-    <tr id="comments{{item.id}}" class="comments">
-    <td colspan="5">
-    {% if item.comments %}
+{% for category in items %}
+{% if items[category] %}
+<h3>{{ category }}</h3>
+{% for item in items[category] %}
+    <input type="checkbox" id="expand{{item.id}}"/>
+    <div id="item{{item.id}}">
+    <label for="expand{{item.id}}">
         <table role="grid">
-          <thead><tr><td>Comment</td><td>Author</td></tr></thead>
+          <tr>
+          <td>
+            {{ item.name }}
+            ( {{ item.comments|length }} comments)
+            {% if current_user.is_administrator %}
+            <a href="{{ url_for(
+              "main.delete_item",
+              list_id=currentlist.id,
+              item_id=item.id
+            )}}">
+              [ delete? ]</a>
+            {% endif %}
+            {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+          </td>
+          </tr>
+        </table>
+    </label>
+    </div>
+    <div id="comments{{item.id}}">
+      <table role="grid">
             {% for comment in item.comments %}
             <tr>
-            <td>{{ comment.body }}</td>
             <td>{{ comment.author | capitalize }}</td>
+            <td>{{ comment.body }}</td>
             </tr>
             {% endfor %}
-        </table>
-    {% endif %}
+      </table>
     {% set action = url_for(
       'main.add_comment',
       list_id=currentlist.id,
       item_id=item.id
     ) %}
     {{ formbase(commentform, action=action) }}
-    </td>
-    </tr>
-    {% endif %}
+    </div>
+{% endfor %}
 
-    {% endfor %}
-    </tbody>
-  </table>
+{% endif %}
+{% endfor %}
 
   {% else %}
   <p>
