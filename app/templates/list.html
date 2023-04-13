@@ -2,62 +2,101 @@
 {% from "form.html" import formbase %}
 
 {% block title %}dibs - {{ currentlist.title }}{% endblock %}
-{% block head %} {{ super() }} {% endblock %} 
+{% block head %}
+
+  {{ super() }}
+
+  {#
+  This enables showing and hiding comment sections.
+  It depends on individually marked elements using the item identifier.
+  #}
+  {% if items %}
+  <style type="text/css" media="screen">
+  input[type=checkbox] { display: none }
+  {% for item in items %}
+  section input#expand{{item.id}}:not(:checked) ~ table tbody tr#comments{{item.id}} { display: none }
+  {% endfor %}
+  </style>
+  {% endif %}
+
+{% endblock %}
 {% block page_content %}
 <main class="container">
-  <hgroup>
-    <h1>
-      {{ currentlist.title }}
-    </h1>
-    <h2>by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a></h2>
-  </hgroup>
+<hgroup>
+  <h1>
+    {{ currentlist.title }}
+  </h1>
+  <h2>by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a></h2>
+</hgroup>
 
-  <section>
+<section>
 
-  {% if items %}
-  <table role="grid">
-    <thead>
-      <tr>
-        <td>#</td>
-        <td>Title</td>
-        <td>Description</td>
-        <td>Category</td>
-        <td></td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in items %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td>
-          {% if item.link %}
-          <a href="https://{{ item.link|safe }}">{{ item.name }}</a>
-          {% else %}
-          {{ item.name }}
-          {% endif %}
-        </td>
-        <td>{{item.description}}</td>
-        <td>{{item.category | last}}</td>
-        <td>
-          {% if current_user.role_id == 2 %}
-          <a href="{{ url_for("main.delete_item", list_id=currentlist.id, item_id=item.id )}}">
-            [ delete? ]</a>
-          {% endif %}
-        </td>
-        {% endfor %}
+{% if items %}
+<table role="grid">
+  <thead>
+    <tr>
+      <td>#</td>
+      <td>Title</td>
+      <td>Description</td>
+      <td>Category</td>
+      <td>Expand</td>
+    </tr>
+  </thead>
+  <tbody class="items">
+    {% for item in items %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>
+        {% if item.link %}
+        <a href="https://{{ item.link|safe }}">{{ item.name }}</a>
+        {% else %}
+        {{ item.name }}
+        {% endif %}
+        {% if current_user.is_administrator %}
+        <a href="{{ url_for(
+          "main.delete_item",
+          list_id=currentlist.id,
+          item_id=item.id
+        )}}">
+          [ delete? ]</a>
+        {% endif %}
+      </td>
+      <td>{{item.description}}</td>
+      <td>{{item.category | last}}</td>
+      <td>
+        <label for="expand{{item.id}}">Expand</label>
+      </td>
+    </tr>
+
+    {# comments #}
+    <input class="folder" id="expand{{item.id}}" type="checkbox" />
+    {% if current_user.id != currentlist.author.id %}
+    <tr id="comments{{item.id}}" class="comments">
+    <td colspan="5">
+    {% if item.comments %}
+        <table role="grid">
+          <thead><tr><td>Comment</td><td>Author</td></tr></thead>
+            {% for comment in item.comments %}
+            <tr>
+            <td>{{ comment.body }}</td>
+            <td>{{ comment.author | capitalize }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    {% set action = url_for(
+      'main.add_comment',
+      list_id=currentlist.id,
+      item_id=item.id
+    ) %}
+    {{ formbase(commentform, action=action) }}
+    </td>
+    </tr>
+    {% endif %}
+
+    {% endfor %}
     </tbody>
   </table>
-  {#
-            {% if current_user.id != currentlist.author.id %}
-                {% if comments %}
-              <ul>
-                {% for comment in comments %}
-                  <blockquote>{{ comment.body }}<footer><cite>—{{ comment.author | capitalize }}</cite></footer></blockquote>
-                {% endfor %}
-              </ul>
-                {% endif %}
-            {% endif %}
-    #}
 
   {% else %}
   <p>
