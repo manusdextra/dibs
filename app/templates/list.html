@@ -1,108 +1,88 @@
 {% extends "base.html" %}
 {% from "form.html" import formbase %}
-
-{% block title %}dibs - {{ currentlist.title }}{% endblock %}
+{% block title %}
+    dibs - {{ currentlist.title }}
+{% endblock title %}
 {% block head %}
-
-  {{ super() }}
-
-  {#
-  This enables showing and hiding comment sections.
-  It depends on individually marked elements using the item identifier.
-  #}
-  <style type="text/css" media="screen">
-  input[type=checkbox] { display: none }
-  {% for category in items %}{% if items[category] %}
-  {% for item in items[category] %}
-  input#expand{{item.id}}:not(:checked) ~ div#comments{{item.id}} { display: none }
-  {% endfor %}
-  {% endif %}{% endfor %}
-  </style>
-
-{% endblock %}
-
+    {{ super() }}
+    {#
+    This enables showing and hiding comment sections.
+    It depends on individually marked elements using the item identifier.
+    #}
+    <style type="text/css" media="screen">
+    input[type=checkbox] { display: none }
+    {% for category in items %}{% if items[category] %}
+    {% for item in items[category] %}
+    input#expand{{item.id}}:not(:checked) ~ div#comments{{item.id}} { display: none }
+    {% endfor %}
+    {% endif %}{% endfor %}
+    </style>
+{% endblock head %}
 {% block page_content %}
-<main>
-<hgroup>
-  <h1>
-    {{ currentlist.title }}
-  </h1>
-  <h2>by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a></h2>
-</hgroup>
-
-<p>Click on individual items to comment on them.</p>
-
-<section>
-
-{% if items %}
-
-{% for category in items %}
-{% if items[category] %}
-<h3>{{ category }}</h3>
-{% for item in items[category] %}
-    <input type="checkbox" id="expand{{item.id}}"/>
-    <div id="item{{item.id}}">
-    <label for="expand{{item.id}}">
-        <table role="grid">
-          <tr>
-          <td>
-            {{ item.name }}
-            ( {{ item.comments|length }} comments)
-            {% if current_user.is_administrator %}
-            <a href="{{ url_for(
-              "main.delete_item",
-              list_id=currentlist.id,
-              item_id=item.id
-            )}}">
-              [ delete? ]</a>
+    <main>
+        <hgroup>
+            <h1>{{ currentlist.title }}</h1>
+            <h2>
+                by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a>
+            </h2>
+        </hgroup>
+        <p>Click on individual items to comment on them.</p>
+        <section>
+            {% if items %}
+                {% for category in items %}
+                    {% if items[category] %}
+                        <h3>{{ category }}</h3>
+                        {% for item in items[category] %}
+                            <input type="checkbox" id="expand{{ item.id }}" />
+                            <div id="item{{ item.id }}">
+                                <label for="expand{{ item.id }}">
+                                    <table role="grid">
+                                        <tr>
+                                            <td>
+                                                {{ item.name }}
+                                                ( {{ item.comments|length }} comments)
+                                                {% if current_user.is_administrator %}
+                                                    <a href="{{ url_for( "main.delete_item", list_id=currentlist.id, item_id=item.id ) }}">[ delete? ]</a>
+                                                {% endif %}
+                                                {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </label>
+                            </div>
+                            <div id="comments{{ item.id }}">
+                                <table role="grid">
+                                    {% for comment in item.comments %}
+                                        <tr>
+                                            <td>{{ comment.author | capitalize }}</td>
+                                            <td>{{ comment.body }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                                {% set action = url_for(
+                                'main.add_comment',
+                                list_id=currentlist.id,
+                                item_id=item.id
+                                ) %}
+                                {{ formbase(commentform, action=action) }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <p>This list is empty.</p>
             {% endif %}
-            {% if item.description %}<p>{{ item.description }}</p>{% endif %}
-          </td>
-          </tr>
-        </table>
-    </label>
-    </div>
-    <div id="comments{{item.id}}">
-      <table role="grid">
-            {% for comment in item.comments %}
-            <tr>
-            <td>{{ comment.author | capitalize }}</td>
-            <td>{{ comment.body }}</td>
-            </tr>
-            {% endfor %}
-      </table>
-    {% set action = url_for(
-      'main.add_comment',
-      list_id=currentlist.id,
-      item_id=item.id
-    ) %}
-    {{ formbase(commentform, action=action) }}
-    </div>
-{% endfor %}
-
-{% endif %}
-{% endfor %}
-
-  {% else %}
-  <p>
-  This list is empty.
-  </p>
-  {% endif %}
-
-  {% if author == current_user %}
-  </section>
-  <section>
-    <div>
-      <h3>
-      Add items
-      </h3>
-      {{ formbase(itemform) }}
-    </div>
-  </section>
-  {% endif %}
-
-  {% if current_user.is_administrator() %}
-  <a href="{{url_for("main.delete_list", list_id=currentlist.id)}}">Delete this list</a>
-  {% endif %}
-</main>
-{% endblock %}
+            {% if author == current_user %}
+            </section>
+            <section>
+                <div>
+                    <h3>Add items</h3>
+                    {{ formbase(itemform) }}
+                </div>
+            </section>
+        {% endif %}
+        {% if current_user.is_administrator() %}
+            <a href="{{ url_for("main.delete_list", list_id=currentlist.id) }}">Delete this list</a>
+        {% endif %}
+    </main>
+{% endblock page_content %}
