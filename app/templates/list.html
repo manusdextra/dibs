@@ -11,11 +11,9 @@
     #}
     <style type="text/css" media="screen">
     input[type=checkbox] { display: none }
-    {% for category in items %}{% if items[category] %}
-    {% for item in items[category] %}
+    {% for category in items %}{% if items[category] %}{% for item in items[category] %}
     input#expand{{item.id}}:not(:checked) ~ div#comments{{item.id}} { display: none }
-    {% endfor %}
-    {% endif %}{% endfor %}
+    {% endfor %}{% endif %}{% endfor %}
     </style>
 {% endblock head %}
 {% block page_content %}
@@ -24,9 +22,15 @@
             <h1>{{ currentlist.title }}</h1>
             <h2>
                 by <a href="{{ url_for("main.profile", username=currentlist.author.username) }}">{{ currentlist.author.username }}</a>
+                <br />
+                {% if current_user.is_administrator() %}
+                    <a href="{{ url_for("main.delete_list", list_id=currentlist.id) }}">[ delete? ]</a>
+                {% endif %}
             </h2>
         </hgroup>
+        {% if current_user != author %}
         <p>Click on individual items to comment on them.</p>
+        {% endif %}
         <section>
             {% if items %}
                 {% for category in items %}
@@ -40,7 +44,7 @@
                                         <tr>
                                             <td>
                                                 {{ item.name }}
-                                                ( {{ item.comments|length }} comments)
+                                                {% if author != current_user %}( {{ item.comments|length }} comments){% endif %}
                                                 {% if current_user.is_administrator %}
                                                     <a href="{{ url_for( "main.delete_item", list_id=currentlist.id, item_id=item.id ) }}">[ delete? ]</a>
                                                 {% endif %}
@@ -50,22 +54,24 @@
                                     </table>
                                 </label>
                             </div>
-                            <div id="comments{{ item.id }}">
-                                <table role="grid">
-                                    {% for comment in item.comments %}
-                                        <tr>
-                                            <td>{{ comment.author | capitalize }}</td>
-                                            <td>{{ comment.body }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                                {% set action = url_for(
-                                'main.add_comment',
-                                list_id=currentlist.id,
-                                item_id=item.id
-                                ) %}
-                                {{ formbase(commentform, action=action) }}
-                            </div>
+                            {% if author != current_user %}
+                                <div id="comments{{ item.id }}">
+                                    <table role="grid">
+                                        {% for comment in item.comments %}
+                                            <tr>
+                                                <td>{{ comment.author | capitalize }}</td>
+                                                <td>{{ comment.body }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                    {% set action = url_for(
+                                    'main.add_comment',
+                                    list_id=currentlist.id,
+                                    item_id=item.id
+                                    ) %}
+                                    {{ formbase(commentform, action=action) }}
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     {% endif %}
                 {% endfor %}
@@ -80,9 +86,6 @@
                     {{ formbase(itemform) }}
                 </div>
             </section>
-        {% endif %}
-        {% if current_user.is_administrator() %}
-            <a href="{{ url_for("main.delete_list", list_id=currentlist.id) }}">Delete this list</a>
         {% endif %}
     </main>
 {% endblock page_content %}
