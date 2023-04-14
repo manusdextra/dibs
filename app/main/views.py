@@ -123,9 +123,9 @@ def delete_item(list_id, item_id) -> ResponseReturnValue:
     return redirect(url_for("main.list", list_id=list_id))
 
 
-@main.route("/lists/<list_id>/addcomment/<item_id>", methods=["POST"])
+@main.route("/lists/<list_id>/create_comment/<item_id>", methods=["POST"])
 @login_required
-def add_comment(list_id, item_id) -> ResponseReturnValue:
+def create_comment(list_id, item_id) -> ResponseReturnValue:
     item = Item.query.filter_by(id=item_id).first()
     form = CommentForm()
     if current_user.can(Permission.COMMENT) and form.validate_on_submit():
@@ -139,6 +139,16 @@ def add_comment(list_id, item_id) -> ResponseReturnValue:
         db.session.add(comment)
         db.session.commit()
         flash("Your comment has been added")
+    return redirect(url_for("main.list", list_id=list_id))
+
+
+@main.route("/lists/<list_id>/delete_comment/<comment_id>", methods=["GET", "POST"])
+@login_required
+def delete_comment(list_id, comment_id) -> ResponseReturnValue:
+    comment = Comment.query.filter_by(id=comment_id).first()
+    if current_user.id == comment.author_id or current_user.is_administrator:
+        db.session.delete(comment)
+        flash(f"Your comment has been deleted")
     return redirect(url_for("main.list", list_id=list_id))
 
 

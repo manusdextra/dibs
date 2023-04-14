@@ -28,9 +28,7 @@
                 {% endif %}
             </h2>
         </hgroup>
-        {% if current_user != author %}
-        <p>Click on individual items to comment on them.</p>
-        {% endif %}
+        {% if current_user != author %}<p>Click on individual items to comment on them.</p>{% endif %}
         <section>
             {% if items %}
                 {% for category in items %}
@@ -60,12 +58,17 @@
                                         {% for comment in item.comments %}
                                             <tr>
                                                 <td>{{ comment.author | capitalize }}</td>
-                                                <td>{{ comment.body }}</td>
+                                                <td>
+                                                    {{ comment.body }}
+                                                    {% if current_user.id == comment.author_id or current_user.is_administrator %}
+                                                        <a href="{{ url_for("main.delete_comment", list_id=currentlist.id, comment_id=comment.id) }}">[ delete? ]</a>
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                     </table>
                                     {% set action = url_for(
-                                    'main.add_comment',
+                                    'main.create_comment',
                                     list_id=currentlist.id,
                                     item_id=item.id
                                     ) %}
