@@ -32,7 +32,7 @@ def index() -> ResponseReturnValue:
 
 @main.route("/lists/create", methods=["GET", "POST"])
 @login_required
-def create() -> ResponseReturnValue:
+def create_list() -> ResponseReturnValue:
     form = ListForm()
     if current_user.can(Permission.CREATE) and form.validate_on_submit():
         newlist = List(
@@ -41,7 +41,7 @@ def create() -> ResponseReturnValue:
         )
         db.session.add(newlist)
         db.session.commit()
-        return redirect(url_for("main.list", list_id=newlist.id))
+        return redirect(url_for("main.view_list", list_id=newlist.id))
     return render_template(
         "create.html",
         form=form,
@@ -50,7 +50,7 @@ def create() -> ResponseReturnValue:
 
 @main.route("/lists/<list_id>", methods=["GET", "POST"])
 @login_required
-def list(list_id) -> ResponseReturnValue:
+def view_list(list_id) -> ResponseReturnValue:
     """
     Show a single list by ID
     """
@@ -64,7 +64,7 @@ def list(list_id) -> ResponseReturnValue:
             list_id=list_id,
         )
         db.session.add(newitem)
-        return redirect(url_for("main.list", list_id=list_id))
+        return redirect(url_for("main.view_list", list_id=list_id))
     currentlist = List.query.filter_by(id=list_id).first()
     author = User.query.filter_by(id=currentlist.author_id).first()
     categories = Category.query.all()
@@ -120,7 +120,7 @@ def delete_item(list_id, item_id) -> ResponseReturnValue:
         flash(f'The item "{item.name}" has been deleted')
     else:
         flash(f"Sorry, you can't delete anything. People might have called dibs on it")
-    return redirect(url_for("main.list", list_id=list_id))
+    return redirect(url_for("main.view_list", list_id=list_id))
 
 
 @main.route("/lists/<list_id>/create_comment/<item_id>", methods=["POST"])
@@ -139,7 +139,7 @@ def create_comment(list_id, item_id) -> ResponseReturnValue:
         db.session.add(comment)
         db.session.commit()
         flash("Your comment has been added")
-    return redirect(url_for("main.list", list_id=list_id))
+    return redirect(url_for("main.view_list", list_id=list_id))
 
 
 @main.route("/lists/<list_id>/delete_comment/<comment_id>", methods=["GET", "POST"])
@@ -149,7 +149,7 @@ def delete_comment(list_id, comment_id) -> ResponseReturnValue:
     if current_user.id == comment.author_id or current_user.is_administrator:
         db.session.delete(comment)
         flash(f"Your comment has been deleted")
-    return redirect(url_for("main.list", list_id=list_id))
+    return redirect(url_for("main.view_list", list_id=list_id))
 
 
 @main.route("/user/<username>")
@@ -195,7 +195,7 @@ def edit_user(username) -> ResponseReturnValue:
         db.session.add(user)
         db.session.commit()
         flash("The profile has been updated.")
-        return redirect(url_for("main.user", username=user.username))
+        return redirect(url_for("main.edit_user", username=user.username))
     form.email.data = user.email
     form.username.data = user.username
     form.confirmed.data = user.confirmed

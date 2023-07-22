@@ -19,7 +19,7 @@
       <ul>
       {% for list in lists %}
       <li>
-        <a href="{{ url_for("main.list", list_id=list.id) }}">
+        <a href="{{ url_for("main.view_list", list_id=list.id) }}">
           {{ list.title|capitalize }}
         </a
         > created by <a

@@ -21,7 +21,7 @@
       {% for list in lists %}
       <li>
         <div>
-          <a href="{{ url_for("main.list", list_id=list.id) }}">{{ list.title }}</a>
+          <a href="{{ url_for("main.view_list", list_id=list.id) }}">{{ list.title }}</a>
           {#
             I have disabled this for now. 
             If people have already commented on the list,
@@ -41,7 +41,7 @@
 
     {% if user == current_user %}
     <div>
-      <a href="{{ url_for("main.create") }}">Create a New list</a>
+      <a href="{{ url_for("main.create_list") }}">Create a New list</a>
     </div>
     {% endif %}
 
